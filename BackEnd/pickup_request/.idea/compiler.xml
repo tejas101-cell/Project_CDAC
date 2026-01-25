@@ -16,14 +16,19 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
+        <module name="Pickup-request" />
         <module name="Tracking_service" />
         <module name="pickup_request" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pickup_request" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Driver_serv" options="-parameters" />
+      <module name="Pickup-request" options="-parameters" />
       <module name="Tracking_service" options="-parameters" />
       <module name="pickup_request" options="-parameters" />
     </option>
