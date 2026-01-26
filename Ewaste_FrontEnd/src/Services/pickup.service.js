@@ -1,16 +1,18 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8082/api/pickups";
+// Using API Gateway (Port 8080) is the best practice.
+// If your Gateway isn't running, use Port 8082 (Direct Pickup Service).
+const API_URL = "http://localhost:8080/api/pickups"; 
 
-const createPickup = (pickupData) => {
+const createPickupRequest = (pickupData) => {
   return axios.post(API_URL, pickupData);
 };
 
-const getPickupById = (requestId) => {
-  return axios.get(`${API_URL}/${requestId}`);
+const getPickupRequestById = (id) => {
+  return axios.get(`${API_URL}/${id}`);
 };
 
 export default {
-  createPickup,
-  getPickupById
+  createPickupRequest,
+  getPickupRequestById
 };
