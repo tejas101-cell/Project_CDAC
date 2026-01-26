@@ -19,7 +19,6 @@ public class RestPickupRequestController {
     @PostMapping("/pickups")
     public ResponseEntity<CreatePickupResponseDTO> createdPickupRequest(@RequestBody CreatePickupRequestDTO requestDTO){
         CreatePickupResponseDTO response = pickupRequestService.createPickupRequest(requestDTO);
-
         return new ResponseEntity<CreatePickupResponseDTO>(response, HttpStatus.CREATED);
     }
 

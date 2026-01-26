@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePickupResponseDTO {
+public class StatusLogRequestDTO {
     private Integer requestId;
     private String status;
-    private String message;
+    private Integer updatedBy;
 }
+

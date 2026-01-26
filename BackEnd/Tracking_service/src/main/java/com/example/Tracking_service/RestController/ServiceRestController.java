@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping
+@RequestMapping("tracking")
 @RequiredArgsConstructor
 public class ServiceRestController {
     private final StatusService statusService;

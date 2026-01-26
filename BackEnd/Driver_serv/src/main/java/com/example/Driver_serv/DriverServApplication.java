@@ -12,5 +12,4 @@ public class DriverServApplication {
 		SpringApplication.run(DriverServApplication.class, args);
         System.out.println("Connection is successful");
 	}
-
 }
