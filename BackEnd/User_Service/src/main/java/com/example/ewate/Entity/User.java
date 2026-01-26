@@ -24,15 +24,6 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "availability_status")
-    private String availabilityStatus;
-
     @Column(name = "status")
     private String status;
 

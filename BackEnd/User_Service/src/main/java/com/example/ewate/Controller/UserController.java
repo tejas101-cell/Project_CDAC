@@ -7,9 +7,9 @@ import com.example.ewate.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -18,14 +18,18 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
             @RequestBody RegisterRequest request) {
-
         return ResponseEntity.ok(userService.register(request));
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(
             @RequestBody LoginRequest request) {
-
         return ResponseEntity.ok(userService.login(request));
     }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
+    }
+
 }

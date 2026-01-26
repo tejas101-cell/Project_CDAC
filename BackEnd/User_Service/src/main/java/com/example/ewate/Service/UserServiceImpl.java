@@ -1,7 +1,5 @@
 package com.example.ewate.Service;
 
-
-
 import com.example.ewate.DTO.LoginRequest;
 import com.example.ewate.DTO.RegisterRequest;
 import com.example.ewate.DTO.UserResponse;
@@ -31,21 +29,15 @@ public class UserServiceImpl implements UserService {
                 });
 
         Role role = roleRepository.findByRoleName(request.getRoleName());
-        if (role == null) {
-            throw new RuntimeException("Role not found");
-        }
 
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPhone(request.getPhone());
-        user.setAddress(request.getAddress());
         user.setRole(role);
 
-        // Password is managed by Identity Provider
+        // Identity Provider will manage authentication
         user.setPassword("IDP_MANAGED");
 
-        user.setAvailabilityStatus("Available");
         user.setStatus("Active");
         user.setCreatedAt(LocalDateTime.now());
 
@@ -56,7 +48,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse login(LoginRequest request) {
 
-        // User is already authenticated by Identity Provider
+        // User already authenticated by IdP
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not registered"));
 
@@ -69,14 +61,18 @@ public class UserServiceImpl implements UserService {
         response.setUserId(user.getUserId());
         response.setName(user.getName());
         response.setEmail(user.getEmail());
-        response.setPhone(user.getPhone());
-        response.setAddress(user.getAddress());
         response.setRoleName(user.getRole().getRoleName());
-
-        response.setAvailabilityStatus(user.getAvailabilityStatus());
         response.setStatus(user.getStatus());
         response.setCreatedAt(user.getCreatedAt());
 
         return response;
     }
+
+    @Override
+    public UserResponse getUserById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return mapToResponse(user);
+    }
+
 }

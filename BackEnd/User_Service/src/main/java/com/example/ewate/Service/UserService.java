@@ -9,4 +9,6 @@ public interface UserService {
     UserResponse register(RegisterRequest request);
 
     UserResponse login(LoginRequest request);
+    UserResponse getUserById(Integer userId);
+
 }
