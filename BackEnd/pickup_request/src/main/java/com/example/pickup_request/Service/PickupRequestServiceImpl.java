@@ -3,11 +3,10 @@ package com.example.pickup_request.Service;
 import com.example.pickup_request.DTO.*;
 import com.example.pickup_request.Entity.PickupItem;
 import com.example.pickup_request.Entity.PickupRequests;
-import com.example.pickup_request.Entity.StatusLog;
 import com.example.pickup_request.Repository.PickupItemRepository;
 import com.example.pickup_request.Repository.PickupRequestRepository;
-import com.example.pickup_request.Repository.StatusLogRepository;
 import com.example.pickup_request.client.UserClient;
+import com.example.pickup_request.feign.TrackingFeignClient;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,16 +19,16 @@ public class PickupRequestServiceImpl implements PickupRequestService {
 
     private final PickupRequestRepository pickupRequestRepository;
     private final PickupItemRepository pickupItemRepository;
-    private final StatusLogRepository statusLogRepository;
 
-    // ADD FEIGN CLIENT
+    // FEIGN CLIENTS
     private final UserClient userClient;
+    private final TrackingFeignClient trackingFeignClient;
 
     @Override
     @Transactional
     public CreatePickupResponseDTO createPickupRequest(CreatePickupRequestDTO requestDTO) {
 
-        // STEP 1: VERIFY USER FROM USER SERVICE
+        // STEP 1: VERIFY USER
         UserResponseDTO user = userClient.getUserById(requestDTO.getUserId());
 
         if (!"Active".equalsIgnoreCase(user.getStatus())) {
@@ -59,15 +58,13 @@ public class PickupRequestServiceImpl implements PickupRequestService {
             pickupItemRepository.save(item);
         });
 
-        // STEP 4: STATUS LOG
-        StatusLog statusLog = StatusLog.builder()
-                .requestId(savedRequest.getRequestId())
-                .status("Requested")
-                .updatedOn(LocalDateTime.now())
-                .updatedBy(requestDTO.getUserId())
-                .build();
+        // STEP 4: CALL TRACKING SERVICE (Feign)
+        CreateStatusRequestLogDTO statusDTO = new CreateStatusRequestLogDTO();
+        statusDTO.setRequestId(savedRequest.getRequestId());
+        statusDTO.setStatus("Requested");
+        statusDTO.setUpdatedBy(requestDTO.getUserId());
 
-        statusLogRepository.save(statusLog);
+        trackingFeignClient.logStatus(statusDTO);
 
         return new CreatePickupResponseDTO(
                 savedRequest.getRequestId(),
