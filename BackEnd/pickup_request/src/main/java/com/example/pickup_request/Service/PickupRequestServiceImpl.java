@@ -20,7 +20,6 @@ public class PickupRequestServiceImpl implements PickupRequestService {
     private final PickupRequestRepository pickupRequestRepository;
     private final PickupItemRepository pickupItemRepository;
 
-    // FEIGN CLIENTS
     private final UserClient userClient;
     private final TrackingFeignClient trackingFeignClient;
 
@@ -28,14 +27,12 @@ public class PickupRequestServiceImpl implements PickupRequestService {
     @Transactional
     public CreatePickupResponseDTO createPickupRequest(CreatePickupRequestDTO requestDTO) {
 
-        // STEP 1: VERIFY USER
         UserResponseDTO user = userClient.getUserById(requestDTO.getUserId());
 
         if (!"Active".equalsIgnoreCase(user.getStatus())) {
             throw new RuntimeException("User is not active");
         }
 
-        // STEP 2: CREATE PICKUP REQUEST
         PickupRequests pickupRequests = PickupRequests.builder()
                 .userId(requestDTO.getUserId())
                 .requestDate(LocalDateTime.now())
@@ -46,7 +43,6 @@ public class PickupRequestServiceImpl implements PickupRequestService {
 
         PickupRequests savedRequest = pickupRequestRepository.save(pickupRequests);
 
-        // STEP 3: SAVE PICKUP ITEMS
         requestDTO.getItems().forEach(itemDTO -> {
             PickupItem item = PickupItem.builder()
                     .requestId(savedRequest.getRequestId())
@@ -54,11 +50,9 @@ public class PickupRequestServiceImpl implements PickupRequestService {
                     .quantity(itemDTO.getQuantity())
                     .remarks(itemDTO.getRemarks())
                     .build();
-
             pickupItemRepository.save(item);
         });
 
-        // STEP 4: CALL TRACKING SERVICE (Feign)
         CreateStatusRequestLogDTO statusDTO = new CreateStatusRequestLogDTO();
         statusDTO.setRequestId(savedRequest.getRequestId());
         statusDTO.setStatus("Requested");
@@ -73,13 +67,23 @@ public class PickupRequestServiceImpl implements PickupRequestService {
         );
     }
 
+    //  STEP 3: OWNERSHIP CHECK HERE
     @Override
-    public PickupRequestResponseDTO getPickupRequestById(Integer requestID) {
+    public PickupRequestResponseDTO getPickupRequestById(
+            Integer requestId,
+            Integer userId,
+            String role) {
 
-        PickupRequests pickupRequests = pickupRequestRepository.findById(requestID)
+        PickupRequests pickup = pickupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
 
-        var items = pickupItemRepository.findByRequestId(requestID)
+        // USER can only see OWN request
+        if ("USER".equalsIgnoreCase(role)
+                && !pickup.getUserId().equals(userId)) {
+            throw new RuntimeException("Access denied: Not your pickup request");
+        }
+
+        var items = pickupItemRepository.findByRequestId(requestId)
                 .stream()
                 .map(item -> new PickupItemResponseDTO(
                         item.getItemName(),
@@ -89,13 +93,25 @@ public class PickupRequestServiceImpl implements PickupRequestService {
                 .toList();
 
         return new PickupRequestResponseDTO(
-                pickupRequests.getRequestId(),
-                pickupRequests.getUserId(),
-                pickupRequests.getRequestDate(),
-                pickupRequests.getPickupDate(),
-                pickupRequests.getPickupAddress(),
-                pickupRequests.getStatus(),
+                pickup.getRequestId(),
+                pickup.getUserId(),
+                pickup.getRequestDate(),
+                pickup.getPickupDate(),
+                pickup.getPickupAddress(),
+                pickup.getStatus(),
                 items
         );
+    }
+
+    //  Used by Tracking Service via Feign
+    @Override
+    public void verifyOwnership(Integer requestId, Integer userId) {
+
+        PickupRequests pickup = pickupRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Pickup not found"));
+
+        if (!pickup.getUserId().equals(userId)) {
+            throw new RuntimeException("Access denied");
+        }
     }
 }

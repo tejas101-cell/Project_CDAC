@@ -6,6 +6,14 @@ import com.example.pickup_request.DTO.CreatePickupResponseDTO;
 import com.example.pickup_request.DTO.PickupRequestResponseDTO;
 
 public interface PickupRequestService {
+
     CreatePickupResponseDTO createPickupRequest(CreatePickupRequestDTO requestDTO);
-    PickupRequestResponseDTO getPickupRequestById(Integer requestID);
+
+    PickupRequestResponseDTO getPickupRequestById(
+            Integer requestId,
+            Integer userId,
+            String role
+    );
+
+    void verifyOwnership(Integer requestId, Integer userId);
 }

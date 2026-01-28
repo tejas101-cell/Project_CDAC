@@ -21,8 +21,10 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
+                // Added explicit claims that the Gateway expects
+                .claim("userId", userId)
                 .claim("email", email)
-                .claim("role", "ROLE_" + roleName.toUpperCase())
+                .claim("roleName", roleName.toUpperCase()) // Key matches Gateway and removed "ROLE_" prefix
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(
