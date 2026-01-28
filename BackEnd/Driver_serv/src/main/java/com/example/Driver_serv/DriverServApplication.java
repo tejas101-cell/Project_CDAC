@@ -9,6 +9,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 public class DriverServApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(DriverServApplication.class, args);
         System.out.println("Connection is successful");
 	}

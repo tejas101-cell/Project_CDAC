@@ -1,13 +1,13 @@
-package com.example.pickup_request.Client;
+package com.example.Assignment_service.Client;
 
-import com.example.pickup_request.DTO.StatusLogRequestDTO;
+import com.example.Assignment_service.AssignmentDTO.StatusLogDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "TRACKING-SERVICE")
-public interface TrackingFeignClient {
-    @PostMapping("tracking/status")
-    public void loggedStatus(@RequestBody StatusLogRequestDTO statusReq);
+public interface TrackingServiceClient {
+    @PostMapping("/tracking/status")
+    public void loggedStatus(@RequestBody StatusLogDTO statusReq);
 }
