@@ -1,13 +1,14 @@
 package com.example.ewate.Service;
 
 import com.example.ewate.DTO.LoginRequest;
+import com.example.ewate.DTO.LoginResponse;
 import com.example.ewate.DTO.RegisterRequest;
 import com.example.ewate.DTO.UserResponse;
 import com.example.ewate.Entity.Role;
 import com.example.ewate.Entity.User;
 import com.example.ewate.Repository.RoleRepository;
 import com.example.ewate.Repository.UserRepository;
-import com.example.ewate.Service.UserService;
+import com.example.ewate.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     public UserResponse register(RegisterRequest request) {
@@ -34,10 +36,7 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setRole(role);
-
-        // Identity Provider will manage authentication
         user.setPassword("IDP_MANAGED");
-
         user.setStatus("Active");
         user.setCreatedAt(LocalDateTime.now());
 
@@ -45,13 +44,29 @@ public class UserServiceImpl implements UserService {
         return mapToResponse(savedUser);
     }
 
+    // ✅ FIXED: return type changed
     @Override
-    public UserResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
-        // User already authenticated by IdP
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not registered"));
 
+        // ✅ Generate JWT
+        String token = jwtUtil.generateToken(
+                user.getUserId(),
+                user.getEmail(),
+                user.getRole().getRoleName()
+        );
+
+        UserResponse userResponse = mapToResponse(user);
+
+        return new LoginResponse(token, userResponse);
+    }
+
+    @Override
+    public UserResponse getUserById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return mapToResponse(user);
     }
 
@@ -67,12 +82,4 @@ public class UserServiceImpl implements UserService {
 
         return response;
     }
-
-    @Override
-    public UserResponse getUserById(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return mapToResponse(user);
-    }
-
 }

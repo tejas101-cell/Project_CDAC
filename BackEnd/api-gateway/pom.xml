@@ -24,7 +24,7 @@
     <!-- Properties -->
     <properties>
         <java.version>21</java.version>
-        <!-- STABLE Spring Cloud for Boot 3.2.x -->
+        <!-- Compatible with Spring Boot 3.2.x -->
         <spring-cloud.version>2023.0.2</spring-cloud.version>
     </properties>
 
@@ -43,11 +43,30 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-        <!--        &lt;!&ndash; Actuator (health, metrics) &ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-actuator</artifactId>-->
-        <!--        </dependency>-->
+        <!-- Reactive Spring Security (REQUIRED) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- JWT (ONLY for validation in Gateway) -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <!-- Test -->
         <dependency>
