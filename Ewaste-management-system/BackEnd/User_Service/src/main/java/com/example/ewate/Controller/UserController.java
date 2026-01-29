@@ -1,0 +1,44 @@
+package com.example.ewate.Controller;
+
+import com.example.ewate.DTO.LoginRequest;
+import com.example.ewate.DTO.RegisterRequest;
+import com.example.ewate.DTO.UserResponse;
+import com.example.ewate.Service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+@RestController
+@RequestMapping("/api/users")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> register(
+            @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(userService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(
+            @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(userService.login(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<UserResponse> updateUserStatus(
+            @PathVariable Integer userId,
+            @RequestParam String status) {
+        return ResponseEntity.ok(userService.updateUserStatus(userId, status));
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Integer userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
+    }
+}
