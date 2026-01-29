@@ -71,7 +71,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
     @Override
     public PickupRequestResponseDTO getPickupRequestById(
             Integer requestId,
-            Integer userId,
+            String userId,
             String role) {
 
         PickupRequests pickup = pickupRequestRepository.findById(requestId)
@@ -105,7 +105,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
 
     //  Used by Tracking Service via Feign
     @Override
-    public void verifyOwnership(Integer requestId, Integer userId) {
+    public void verifyOwnership(Integer requestId, String userId) {
 
         PickupRequests pickup = pickupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Pickup not found"));

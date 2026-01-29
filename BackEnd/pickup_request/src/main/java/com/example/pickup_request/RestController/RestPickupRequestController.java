@@ -29,11 +29,11 @@ public class RestPickupRequestController {
     @GetMapping("/pickups/{requestId}")
     public ResponseEntity<PickupRequestResponseDTO> getPickupRequestByID(
             @PathVariable Integer requestId,
-            @RequestHeader("X-User-Id") Integer userId,
-            @RequestHeader("X-User-Role") String role) {
+            @RequestHeader("X-User-Id") String userId, // Updated from Integer to String
+            @RequestHeader("X-User-Roles") String roles) { // Updated to match Gateway header name
 
         return ResponseEntity.ok(
-                pickupRequestService.getPickupRequestById(requestId, userId, role)
+                pickupRequestService.getPickupRequestById(requestId, userId, roles)
         );
     }
 
@@ -41,7 +41,7 @@ public class RestPickupRequestController {
     @GetMapping("/pickups/{requestId}/verify/{userId}")
     public void verifyOwnership(
             @PathVariable Integer requestId,
-            @PathVariable Integer userId) {
+            @PathVariable String userId) { // Updated from Integer to String
 
         pickupRequestService.verifyOwnership(requestId, userId);
     }

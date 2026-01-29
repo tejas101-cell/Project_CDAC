@@ -26,7 +26,7 @@ public class Assignment {
     private Integer requestId;
 
     @Column(name = "collector_id", nullable = false)
-    private Integer collectorId;
+    private String collectorId;
 
     @Column(name = "assigned_date")
     private LocalDateTime assignedDate;

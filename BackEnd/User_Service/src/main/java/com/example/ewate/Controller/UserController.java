@@ -1,7 +1,5 @@
 package com.example.ewate.Controller;
 
-import com.example.ewate.DTO.LoginRequest;
-import com.example.ewate.DTO.LoginResponse;
 import com.example.ewate.DTO.RegisterRequest;
 import com.example.ewate.DTO.UserResponse;
 import com.example.ewate.Service.UserService;
@@ -17,7 +15,7 @@ public class UserController {
 
     private final UserService userService;
 
-    // Register User
+    // Register User (Note: In Keycloak setup, this might be triggered by a webhook or direct sync)
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(
             @RequestBody RegisterRequest request) {
@@ -25,18 +23,10 @@ public class UserController {
         return ResponseEntity.ok(userService.register(request));
     }
 
-    // Login User
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @RequestBody LoginRequest request) {
-
-        return ResponseEntity.ok(userService.login(request));
-    }
-
     // Get User By ID
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponse> getUserById(
-            @PathVariable Integer userId) {
+            @PathVariable String userId) { // Updated from Integer to String
 
         return ResponseEntity.ok(userService.getUserById(userId));
     }

@@ -11,9 +11,9 @@ public interface PickupRequestService {
 
     PickupRequestResponseDTO getPickupRequestById(
             Integer requestId,
-            Integer userId,
+            String userId,
             String role
     );
 
-    void verifyOwnership(Integer requestId, Integer userId);
+    void verifyOwnership(Integer requestId, String userId);
 }

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class StatusLogDTO {
     private Integer requestId;
     private String status;
-    private Integer updatedBy;
+    private String updatedBy;
 }

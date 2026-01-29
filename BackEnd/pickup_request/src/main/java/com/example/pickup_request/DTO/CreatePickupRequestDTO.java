@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePickupRequestDTO {
-    private Integer userId;
+    private String userId;
     private LocalDate pickupDate;
     private String pickupAddress;
     private List<PickupItemRequestDTO> items;

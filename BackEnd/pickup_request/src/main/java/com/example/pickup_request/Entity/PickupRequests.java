@@ -22,7 +22,7 @@ public class PickupRequests {
     private Integer requestId;
 
     @Column(name = "user_id", nullable = false)
-    private Integer userId;
+    private String userId;
 
     @Column(name = "request_date")
     private LocalDateTime requestDate;

@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PickupRequestResponseDTO {
     private Integer requestID;
-    private Integer userID;
+    private String userID;
     private LocalDateTime requestDate;
     private LocalDate pickupDate;
     private String pickupAddress;

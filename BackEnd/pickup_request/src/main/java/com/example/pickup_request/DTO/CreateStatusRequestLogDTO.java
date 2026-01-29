@@ -6,5 +6,5 @@ import lombok.Data;
 public class CreateStatusRequestLogDTO {
     private Integer requestId;
     private String status;
-    private Integer updatedBy;
+    private String updatedBy;
 }

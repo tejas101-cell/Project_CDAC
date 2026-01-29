@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AssignmentRequestDTO {
     private Integer requestId;
-    private Integer collectorId;
+    private String collectorId;
 }

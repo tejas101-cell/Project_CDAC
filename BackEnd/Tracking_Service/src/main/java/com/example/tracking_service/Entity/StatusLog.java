@@ -27,7 +27,7 @@ public class StatusLog {
     private String status;
 
     @Column(name = "updated_by", nullable = false)
-    private int updatedBy;
+    private String updatedBy;
 
     @Column(name = "updated_on")
     private LocalDateTime updatedOn;
