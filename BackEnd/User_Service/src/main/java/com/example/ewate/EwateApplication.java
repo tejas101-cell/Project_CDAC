@@ -8,6 +8,7 @@ public class EwateApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EwateApplication.class, args);
+        System.out.println("Connection is successful");
 	}
 
 }

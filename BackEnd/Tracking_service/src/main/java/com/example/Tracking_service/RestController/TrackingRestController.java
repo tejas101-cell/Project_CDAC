@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("tracking")
 @RequiredArgsConstructor
-public class ServiceRestController {
+public class TrackingRestController {
     private final StatusService statusService;
 
     @PostMapping("/status")

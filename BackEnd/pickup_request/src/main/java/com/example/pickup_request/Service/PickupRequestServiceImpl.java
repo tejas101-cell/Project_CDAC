@@ -87,4 +87,13 @@ public class PickupRequestServiceImpl implements PickupRequestService{
                 items
         );
     }
+
+    @Override
+    @Transactional
+    public void updatePickupStatus(Integer requestId, String status) {
+        int updated = pickupRequestRepository.updateStatus(requestId, status);
+        if (updated == 0){
+            throw new RuntimeException("Pickup request not found");
+        }
+    }
 }

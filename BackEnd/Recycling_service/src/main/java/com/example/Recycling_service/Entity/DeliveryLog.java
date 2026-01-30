@@ -1,26 +1,25 @@
-package com.example.Assignment_service.Entity;
+package com.example.Recycling_service.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "pickup_assignments")
 @Builder
-public class Assignment {
+@Table(name = "delivery_logs")
+public class DeliveryLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "assignment_id")
-    private Integer assignmentId;
+    @Column(name = "delivery_id")
+    private Integer deliveryId;
 
     @Column(name = "request_id", nullable = false)
     private Integer requestId;
@@ -28,8 +27,11 @@ public class Assignment {
     @Column(name = "collector_id", nullable = false)
     private Integer collectorId;
 
-    @Column(name = "assigned_date")
-    private LocalDateTime assignedDate;
+    @Column(name = "recycler_id", nullable = false)
+    private Integer recyclerId;
+
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
 
     @Column(name = "status", nullable = false)
     private String status;

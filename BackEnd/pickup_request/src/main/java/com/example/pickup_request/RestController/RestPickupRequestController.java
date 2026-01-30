@@ -28,4 +28,12 @@ public class RestPickupRequestController {
         PickupRequestResponseDTO pickupRequest = pickupRequestService.getPickupRequestById(requestId);
         return ResponseEntity.ok(pickupRequest);
     }
+    // updating the status
+    @PutMapping("/pickups/{requestId}/status")
+    public ResponseEntity<String> updatedPickupStatus(@PathVariable("requestId") Integer requestId,
+                                    @RequestParam String status){
+
+        pickupRequestService.updatePickupStatus(requestId, status);
+        return ResponseEntity.ok("Successfully updated");
+    }
 }
