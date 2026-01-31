@@ -55,17 +55,23 @@ public class JwtAuthenticationGatewayFilterFactory
 
                         @SuppressWarnings("unchecked")
                         List<String> roles = (List<String>) realmAccess.get("roles");
+                        
+                        // Debug log to terminal
+                        System.out.println("[Gateway Security] Path: " + path + " | Roles: " + roles);
 
                         // RBAC CHECK
                         if (!isAuthorized(roles, path)) {
+                            System.out.println("[Gateway Security] Access FORBIDDEN for " + path);
                             return forbidden(exchange);
                         }
+                        
+                        System.out.println("[Gateway Security] Access GRANTED for " + path);
 
                         // FORWARD INFO TO MICROSERVICES
                         ServerWebExchange mutatedExchange = exchange.mutate()
                                 .request(exchange.getRequest().mutate()
                                         .header("X-User-Id", userId)
-                                        .header("X-User-Roles", String.join(",", roles))
+                                        .header("X-User-Role", String.join(",", roles))
                                         .build())
                                 .build();
 
@@ -76,16 +82,48 @@ public class JwtAuthenticationGatewayFilterFactory
     }
 
     // RBAC logic remains the same...
-    private boolean isAuthorized(List<String> roles, String path) {
-        if (roles.contains("ADMIN")) return true;
-        if (roles.contains("USER")) {
-            return path.startsWith("/api/pickups") || path.startsWith("/api/tracking");
+   private boolean isAuthorized(List<String> roles, String path) {
+    if (roles == null) return false;
+    
+    // Normalize roles to uppercase
+    List<String> upperRoles = roles.stream().map(String::toUpperCase).toList();
+
+    if (upperRoles.contains("ADMIN")) return true;
+
+    if (upperRoles.contains("USER")) {
+        // Allow common pickup and tracking access
+        // AND allow fetching disposal certificates
+        if (path.startsWith("/api/pickups") || 
+            path.startsWith("/api/tracking") ||
+            path.startsWith("/api/recycle/certificate")) {
+            return true;
         }
-        if (roles.contains("COLLECTOR")) {
-            return path.startsWith("/api/pickups/assigned") || path.startsWith("/api/tracking");
-        }
-        return false;
     }
+
+    if (upperRoles.contains("COLLECTOR")) {
+        // Allow collector-specific endpoints
+        if (path.startsWith("/api/pickups/collector") || 
+            path.startsWith("/api/users") ||
+            path.startsWith("/api/recycle") ||
+            path.contains("/status") ||
+            path.contains("/availability") ||
+            path.startsWith("/api/tracking")) {
+            return true;
+        }
+    }
+
+    if (upperRoles.contains("RECYCLER")) {
+        // Allow recycler endpoints
+        if (path.startsWith("/api/recycle") || 
+            path.contains("/availability") ||
+            path.startsWith("/api/users") ||
+            path.startsWith("/api/tracking")) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
     private Mono<Void> unauthorized(ServerWebExchange exchange) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

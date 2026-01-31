@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private String userId;
 
@@ -21,11 +20,14 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     @Column(name = "status")
     private String status;
+
+@Column(name = "availability")
+private String availability = "AVAILABLE"; 
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

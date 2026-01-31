@@ -13,3 +13,4 @@ public interface TrackingFeignClient {
     @PostMapping("/status")
     void logStatus(@RequestBody CreateStatusRequestLogDTO requestDTO);
 }
+

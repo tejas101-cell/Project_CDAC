@@ -6,10 +6,10 @@ import com.example.ewate.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -30,4 +30,26 @@ public class UserController {
 
         return ResponseEntity.ok(userService.getUserById(userId));
     }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    // Update User Status
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<Void> updateStatus(
+            @PathVariable String userId,
+            @RequestParam String status) {
+        userService.updateStatus(userId, status);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{userId}/availability")
+    public ResponseEntity<Void> updateAvailability(
+        @PathVariable String userId,
+        @RequestParam String availability) {
+    userService.updateAvailability(userId, availability);
+    return ResponseEntity.ok().build();
+}
 }

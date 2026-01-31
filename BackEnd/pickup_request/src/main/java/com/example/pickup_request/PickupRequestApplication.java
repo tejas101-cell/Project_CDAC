@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class PickupRequestApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(PickupRequestApplication.class, args);
+        SpringApplication.run(PickupRequestApplication.class, args);
 	}
 
 }

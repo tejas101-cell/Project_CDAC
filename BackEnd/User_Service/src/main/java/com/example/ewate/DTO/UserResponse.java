@@ -12,5 +12,6 @@ public class UserResponse {
     private String email;
     private String roleName;
     private String status;
+private String availability;
     private LocalDateTime createdAt;
 }
