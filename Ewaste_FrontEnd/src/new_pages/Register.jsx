@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import authService from '../Services/auth.service';
+import Notification from '../new_components/Notification';
 import '../styling/Auth.css';
 
 const Register = () => {
@@ -9,11 +10,17 @@ const Register = () => {
     const [password, setPassword] = useState(''); // UI only (ignored)
     const [confirmPassword, setConfirmPassword] = useState(''); // UI only
     const [role, setRole] = useState('User'); // BACKEND ROLE FORMAT
+    const [address, setAddress] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
     const navigate = useNavigate();
+
+    const showNotify = (message, type = 'success') => {
+        setNotification({ show: true, message, type });
+    };
 
     useEffect(() => {
         setRole('User');
@@ -24,7 +31,6 @@ const Register = () => {
         setLoading(true);
         setError('');
 
-        // UI validation ONLY (backend ignores password)
         if (password !== confirmPassword) {
             setError('Passwords do not match');
             setLoading(false);
@@ -32,20 +38,26 @@ const Register = () => {
         }
 
         try {
-            // ✅ BACKEND EXPECTS: name, email, roleName
-            await authService.register(username, email, role);
+            // Step 1: Register in backend (now sending password for Keycloak sync)
+            await authService.register(username, email, role, password);
 
             setSuccess(true);
+            setError('');
+
+            // Show message to user
+            showNotify('Registration successful! Redirecting to login...');
+
             setTimeout(() => {
                 navigate('/login');
-            }, 2000);
+            }, 1500);
+
         } catch (error) {
             console.error('Registration failed', error);
+            const serverMessage = error.response?.data?.message || error.response?.data;
             setError(
-                error.response?.data?.message ||
-                'Registration failed. Please try again.'
+                typeof serverMessage === 'string' ? serverMessage :
+                    'Registration failed. Ensure all fields are valid or server is online.'
             );
-        } finally {
             setLoading(false);
         }
     };
@@ -56,6 +68,12 @@ const Register = () => {
 
     return (
         <div className="auth-page">
+            <Notification
+                show={notification.show}
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification({ ...notification, show: false })}
+            />
             <div className="auth-container">
                 <div className="card auth-card">
                     <div className="auth-logo-section">
@@ -122,10 +140,28 @@ const Register = () => {
                             >
                                 <option value="User">User</option>
                                 <option value="Collector">Collector</option>
-                                <option value="Recycling_centre">Recycler</option>
-                                <option value="Admin">Admin</option>
+                                <option value="Recycler">Recycler</option>
                             </select>
                         </div>
+
+                        {role === 'User' && (
+                            <div className="mb-3">
+                                <label htmlFor="address" className="form-label">Residential Address (Permanent)</label>
+                                <textarea
+                                    className="form-control"
+                                    id="address"
+                                    rows="3"
+                                    placeholder="Enter your full residential address (for certificate delivery)"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    required
+                                    disabled={loading || success}
+                                ></textarea>
+                                <div className="form-text text-muted" style={{ fontSize: '0.8rem', marginTop: '4px' }}>
+                                    This address will be used by recyclers to send your e-waste certificates.
+                                </div>
+                            </div>
+                        )}
 
                         {/* PASSWORD FIELDS KEPT FOR UI ONLY */}
                         <div className="mb-3">

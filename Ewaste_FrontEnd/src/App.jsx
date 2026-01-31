@@ -4,9 +4,12 @@ import Login from "./new_pages/Login";
 import Register from "./new_pages/Register";
 import AdminDashboard from "./new_pages/AdminDashboard";
 import UserDashboard from "./new_pages/UserDashboard";
+import CreateRequest from "./new_pages/CreateRequest";
 import CollectorDashboard from "./new_pages/CollectorDashboard";
 import RecyclerDashboard from "./new_pages/RecyclerDashboard";
 import ManageRequests from "./new_pages/ManageRequests";
+import MyRequests from "./new_pages/MyRequests";
+import RequestDetails from "./new_pages/RequestDetails";
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/manage-requests" element={<ManageRequests />} />
       <Route path="/dashboard" element={<UserDashboard />} />
+      <Route path="/create-request" element={<CreateRequest />} />
+      <Route path="/my-requests" element={<MyRequests />} />
+      <Route path="/requests/:id" element={<RequestDetails />} />
       <Route path="/collector/dashboard" element={<CollectorDashboard />} />
       <Route path="/recycler/dashboard" element={<RecyclerDashboard />} />
     </Routes>
@@ -24,3 +30,4 @@ function App() {
 }
 
 export default App;
+

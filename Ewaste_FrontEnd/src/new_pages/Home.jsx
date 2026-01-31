@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../new_components/NavigableBar';
 import Footer from '../new_components/Footer';
@@ -7,6 +7,14 @@ import '../styling/NavigableBar.css';
 import '../styling/Footer.css';
 
 const Home = () => {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    }, []);
     return (
         <div className="home-page">
             <Navbar />
@@ -29,15 +37,17 @@ const Home = () => {
                                     Join thousands in making a difference. Dispose of your electronic waste responsibly
                                     and contribute to a sustainable tomorrow.
                                 </p>
-                                <div className="d-flex gap-3 flex-wrap">
-                                    <Link to="/register" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
-                                        Get Started
-                                        <i className="bi bi-arrow-left ms-2"></i>
-                                    </Link>
-                                    <Link to="/login" className="btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
-                                        Sign In
-                                    </Link>
-                                </div>
+                                {!user && (
+                                    <div className="d-flex gap-3 flex-wrap">
+                                        <Link to="/register" className="btn btn-primary btn-lg px-5 py-3 rounded-pill">
+                                            Get Started
+                                            <i className="bi bi-arrow-left ms-2"></i>
+                                        </Link>
+                                        <Link to="/login" className="btn btn-outline-primary btn-lg px-5 py-3 rounded-pill">
+                                            Sign In
+                                        </Link>
+                                    </div>
+                                )}
                                 <div className="stats-row mt-5">
                                     <div className="stat-item">
                                         <h3 className="fw-bold text-primary mb-0">10K+</h3>
@@ -220,10 +230,12 @@ const Home = () => {
                         <p className="lead text-white mb-4">
                             Join our community and start your journey towards sustainable e-waste management today.
                         </p>
-                        <Link to="/register" className="btn btn-light btn-lg px-5 py-3 rounded-pill">
-                            Get Started Now
-                            <i className="bi bi-arrow-right ms-2"></i>
-                        </Link>
+                        {!user && (
+                            <Link to="/register" className="btn btn-light btn-lg px-5 py-3 rounded-pill">
+                                Get Started Now
+                                <i className="bi bi-arrow-right ms-2"></i>
+                            </Link>
+                        )}
                     </div>
                 </div>
             </section>

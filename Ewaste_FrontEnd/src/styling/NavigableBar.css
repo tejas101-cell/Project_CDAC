@@ -157,6 +157,39 @@
     border-top-color: var(--bg-body);
 }
 
+/* Action Buttons in Navbar */
+.nav-action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 1rem !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    height: 42px !important;
+    /* Fixed height to match Home link alignment */
+    line-height: 42px !important;
+    margin-top: 4px;
+    /* Slight offset for better optical alignment */
+}
+
+.nav-action-btn:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border-color: white !important;
+    transform: translateY(-1px) !important;
+}
+
+.nav-action-btn i {
+    font-size: 1.1rem !important;
+    margin-top: -2px;
+}
+
 /* Responsive */
 @media (max-width: 991px) {
     .navbar {

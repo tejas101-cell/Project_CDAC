@@ -17,34 +17,14 @@ const Login = () => {
     setError('');
 
     try {
-      // ✅ BACKEND EXPECTS ONLY EMAIL
-      const response = await authService.login(email);
-
-      // store user in localStorage
-      authService.setCurrentUser(response.data);
-
-      // role-based navigation (MATCH BACKEND ROLE NAMES)
-      const role = response.data.roleName;
-
-      if (role === 'Admin') {
-        navigate('/admin/dashboard');
-      } else if (role === 'Collector') {
-        navigate('/collector/dashboard');
-      } else if (role === 'Recycling_centre') {
-        navigate('/recycler/dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      // Redirect to Keycloak login
+      console.log('--- ATTEMPTING KEYCLOAK LOGIN ---');
+      console.log('Calling authService.login()...');
+      await authService.login();
     } catch (error) {
       console.error('Login failed', error);
-
-      let errorMessage = 'User not registered. Please register first.';
-      if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
-      }
-
-      setError(errorMessage);
-    } finally {
+      console.log('Error details:', error.response); // Debuglog
+      setError('Login failed. Please try again.');
       setLoading(false);
     }
   };

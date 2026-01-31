@@ -1,54 +1,100 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import NavigableBar from '../new_components/NavigableBar';
-import Footer from '../new_components/Footer';
 import authService from '../Services/auth.service';
+import Navigablebar from '../new_components/NavigableBar';
+import Notification from '../new_components/Notification';
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('All Users');
-
-    // Fetch real users from authService
     const [users, setUsers] = useState([]);
+    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+
+    const showNotify = (message, type = 'success') => {
+        setNotification({ show: true, message, type });
+    };
 
     useEffect(() => {
-        const fetchUsers = () => {
-            const allUsers = authService.getAllUsers();
-            setUsers(allUsers);
+        const fetchUsers = async () => {
+            try {
+                const allUsers = await authService.getAllUsers();
+                setUsers(allUsers);
+            } catch (error) {
+                console.error("Failed to fetch users", error);
+            }
         };
         fetchUsers();
     }, []);
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case 'Approved': return { color: '#10b981', backgroundColor: '#ecfdf5' };
+            case 'Approved':
+            case 'Active': return { color: '#10b981', backgroundColor: '#ecfdf5' };
             case 'Pending': return { color: '#f59e0b', backgroundColor: '#fffbe6' };
             case 'Rejected': return { color: '#ef4444', backgroundColor: '#fef2f2' };
             default: return {};
         }
     };
 
+    const stats = {
+        total: users.length,
+        pending: users.filter(u => (u.status || '').toUpperCase() === 'PENDING').length,
+        approved: users.filter(u => {
+            const s = (u.status || '').toUpperCase();
+            return s === 'APPROVED' || s === 'ACTIVE';
+        }).length,
+        rejected: users.filter(u => (u.status || '').toUpperCase() === 'REJECTED').length,
+        // Role Breakdown
+        customers: users.filter(u => (u.roleName || '').toUpperCase() === 'USER').length,
+        collectors: users.filter(u => (u.roleName || '').toUpperCase() === 'COLLECTOR').length,
+        recyclers: users.filter(u => (u.roleName || '').toUpperCase() === 'RECYCLER').length
+    };
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = () => setOpenDropdownId(null);
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
+    const handleStatusChange = async (userId, status) => {
+        try {
+            // Map "Active" to "Approved" for consistency if needed, or stick to "Active"
+            // Backend uses "Active" in one place and "Approved" check in login. 
+            // Let's ensure consistency. Implementation plan said "Approved". 
+            // Checking UserServiceImpl: setStatus("Pending"), check "Approved". 
+            // So we must send "Approved".
+            const statusToSend = status === 'Active' ? 'Approved' : status;
+
+            await authService.updateUserStatus(userId, statusToSend);
+
+            // Refresh list
+            const allUsers = await authService.getAllUsers();
+            setUsers(allUsers);
+            showNotify(`User status updated to ${statusToSend}!`);
+        } catch (error) {
+            console.error("Failed to update user status", error);
+            showNotify("Failed to update user status", "danger");
+        }
+    };
+
     return (
         <div className="min-vh-100 d-flex flex-column" style={{ backgroundColor: '#f8fafc' }}>
-            <NavigableBar />
-            <main className="flex-grow-1 container py-5 mt-5">
-                {/* Custom Admin Header Match Screenshot */}
-                <div className="d-flex justify-content-between align-items-start mb-4 bg-white p-4 rounded shadow-sm border-start border-4" style={{ borderLeftColor: '#0D9488' }}>
+            <Navigablebar />
+
+            <Notification
+                show={notification.show}
+                message={notification.message}
+                type={notification.type}
+                onClose={() => setNotification({ ...notification, show: false })}
+            />
+            <div style={{ paddingTop: '80px' }}></div>
+            <main className="flex-grow-1 container py-5">
+                {/* Header Title Only */}
+                <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <div className="d-flex align-items-center">
-                            <i className="bi bi-shield-check fs-3 me-3" style={{ color: '#0D9488' }}></i>
-                            <h2 className="fw-bold mb-0" style={{ color: '#1a202c' }}>Admin Dashboard</h2>
-                        </div>
+                        <h2 className="fw-bold mb-0" style={{ color: '#1a202c' }}>Admin Dashboard</h2>
                         <p className="text-muted small mb-0 mt-1">Smart E-Waste Management System</p>
-                    </div>
-                    <div className="d-flex gap-2">
-                        <Link to="/admin/manage-requests" className="btn d-flex align-items-center px-4 py-2" style={{ backgroundColor: '#ccfbf1', color: '#0D9488', border: 'none', borderRadius: '50px', textDecoration: 'none' }}>
-                            <i className="bi bi-clipboard-check me-2"></i>
-                            <span className="fw-semibold">Manage Requests</span>
-                        </Link>
-                        <button className="btn d-flex align-items-center px-4 py-2 border" style={{ backgroundColor: '#fff', color: '#4a5568', borderRadius: '4px' }}>
-                            <i className="bi bi-box-arrow-right me-2"></i>
-                            <span>Logout</span>
-                        </button>
                     </div>
                 </div>
 
@@ -62,7 +108,7 @@ const AdminDashboard = () => {
                                     <i className="bi bi-people-fill text-white fs-4"></i>
                                 </div>
                                 <div>
-                                    <h3 className="fw-bold mb-0">8</h3>
+                                    <h3 className="fw-bold mb-0">{stats.total}</h3>
                                     <p className="text-muted small mb-0">Total Users</p>
                                 </div>
                             </div>
@@ -76,7 +122,7 @@ const AdminDashboard = () => {
                                     <i className="bi bi-clock text-white fs-4"></i>
                                 </div>
                                 <div>
-                                    <h3 className="fw-bold mb-0">6</h3>
+                                    <h3 className="fw-bold mb-0">{stats.pending}</h3>
                                     <p className="text-muted small mb-0">Pending Approval</p>
                                 </div>
                             </div>
@@ -90,7 +136,7 @@ const AdminDashboard = () => {
                                     <i className="bi bi-check-circle text-white fs-4"></i>
                                 </div>
                                 <div>
-                                    <h3 className="fw-bold mb-0">2</h3>
+                                    <h3 className="fw-bold mb-0">{stats.approved}</h3>
                                     <p className="text-muted small mb-0">Approved</p>
                                 </div>
                             </div>
@@ -104,10 +150,32 @@ const AdminDashboard = () => {
                                     <i className="bi bi-x-circle text-white fs-4"></i>
                                 </div>
                                 <div>
-                                    <h3 className="fw-bold mb-0">0</h3>
+                                    <h3 className="fw-bold mb-0">{stats.rejected}</h3>
                                     <p className="text-muted small mb-0">Rejected</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Role Specific Stats */}
+                <div className="row g-3 mb-4">
+                    <div className="col-md-4">
+                        <div className="bg-white p-3 rounded shadow-sm border-start border-4" style={{ borderLeftColor: '#3b82f6' }}>
+                            <span className="text-muted small fw-bold text-uppercase">Total Customers</span>
+                            <h4 className="fw-bold mb-0 mt-1">{stats.customers}</h4>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div className="bg-white p-3 rounded shadow-sm border-start border-4" style={{ borderLeftColor: '#f59e0b' }}>
+                            <span className="text-muted small fw-bold text-uppercase">Total Collectors</span>
+                            <h4 className="fw-bold mb-0 mt-1">{stats.collectors}</h4>
+                        </div>
+                    </div>
+                    <div className="col-md-4">
+                        <div className="bg-white p-3 rounded shadow-sm border-start border-4" style={{ borderLeftColor: '#0ea5e9' }}>
+                            <span className="text-muted small fw-bold text-uppercase">Total Recyclers</span>
+                            <h4 className="fw-bold mb-0 mt-1">{stats.recyclers}</h4>
                         </div>
                     </div>
                 </div>
@@ -130,7 +198,7 @@ const AdminDashboard = () => {
                 </div>
 
                 {/* Users Table */}
-                <div className="card border-0 shadow-sm rounded-3 overflow-hidden bg-white mt-4">
+                <div className="card border-0 shadow-sm rounded-3 bg-white mt-4">
                     <div className="table-responsive">
                         <table className="table table-hover align-middle mb-0">
                             <thead style={{ backgroundColor: '#fbfcfd' }}>
@@ -138,34 +206,68 @@ const AdminDashboard = () => {
                                     <th className="px-4 py-3 border-0 small text-uppercase text-muted fw-bold">ID</th>
                                     <th className="py-3 border-0 small text-uppercase text-muted fw-bold">Full Name</th>
                                     <th className="py-3 border-0 small text-uppercase text-muted fw-bold">Email</th>
+                                    <th className="py-3 border-0 small text-uppercase text-muted fw-bold">Account Type</th>
                                     <th className="py-3 border-0 small text-uppercase text-muted fw-bold">Registration Date</th>
                                     <th className="py-3 border-0 small text-uppercase text-muted fw-bold">Status</th>
                                     <th className="py-3 border-0 small text-uppercase text-muted fw-bold text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {users.filter(u => activeTab === 'All Users' || u.status === activeTab).map((user) => (
-                                    <tr key={user.id} className="border-bottom">
-                                        <td className="px-4 py-4 text-muted small">{user.id}</td>
+                                {users.filter(u => {
+                                    if (!u.name || !u.userId) return false;
+                                    if (activeTab === 'All Users') return true;
+
+                                    const status = (u.status || '').toUpperCase();
+                                    const tab = activeTab.toUpperCase();
+
+                                    if (tab === 'APPROVED') {
+                                        return status === 'APPROVED' || status === 'ACTIVE';
+                                    }
+                                    return status === tab;
+                                }).map((user) => (
+                                    <tr key={user.userId} className="border-bottom">
+                                        <td className="px-4 py-4 text-muted small">{user.userId}</td>
                                         <td className="py-4">
                                             <div className="d-flex align-items-center">
                                                 <div className="rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold" style={{ width: '40px', height: '40px', backgroundColor: '#e2e8f0', color: '#4a5568', fontSize: '14px' }}>
-                                                    {user.fullName.split(' ').map(n => n[0]).join('')}
+                                                    {user.name && user.name.split(' ').map(n => n[0]).join('')}
                                                 </div>
-                                                <span className="fw-semibold text-dark">{user.fullName}</span>
+                                                <span className="fw-semibold text-dark">{user.name}</span>
                                             </div>
                                         </td>
                                         <td className="py-4 text-muted">{user.email}</td>
-                                        <td className="py-4 text-muted">{user.regDate}</td>
+                                        <td className="py-4">
+                                            <span className="badge bg-light text-dark border fw-normal">
+                                                {user.roleName || 'User'}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 text-muted">{new Date(user.createdAt).toLocaleDateString()}</td>
                                         <td className="py-4">
                                             <span className="badge rounded-pill px-3 py-2 fw-medium" style={getStatusStyle(user.status)}>
                                                 {user.status}
                                             </span>
                                         </td>
                                         <td className="py-4 text-center">
-                                            <button className="btn btn-sm text-white px-3" style={{ backgroundColor: '#0D9488', borderRadius: '4px' }}>
-                                                Review
-                                            </button>
+                                            <div className="dropdown position-relative">
+                                                <button
+                                                    className="btn btn-sm text-white px-3 dropdown-toggle"
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenDropdownId(openDropdownId === user.userId ? null : user.userId);
+                                                    }}
+                                                    style={{ backgroundColor: '#0D9488', borderRadius: '4px' }}
+                                                >
+                                                    Action
+                                                </button>
+                                                {openDropdownId === user.userId && (
+                                                    <ul className="dropdown-menu show position-absolute end-0 mt-1 shadow-lg border-0" style={{ zIndex: 1000, display: 'block' }}>
+                                                        <li><button className="dropdown-item" onClick={() => { handleStatusChange(user.userId, 'Active'); setOpenDropdownId(null); }}>Approve</button></li>
+                                                        <li><button className="dropdown-item" onClick={() => { handleStatusChange(user.userId, 'Rejected'); setOpenDropdownId(null); }}>Reject</button></li>
+                                                        <li><button className="dropdown-item" onClick={() => { handleStatusChange(user.userId, 'Pending'); setOpenDropdownId(null); }}>Mark Pending</button></li>
+                                                    </ul>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -174,7 +276,6 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             </main>
-            <Footer />
         </div>
     );
 };

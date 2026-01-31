@@ -35,7 +35,7 @@ function Footer() {
               <li><Link to="/" className="footer-link"><i className="bi bi-chevron-right"></i>Home</Link></li>
               <li><Link to="/about" className="footer-link"><i className="bi bi-chevron-right"></i>About Us</Link></li>
               <li><Link to="/services" className="footer-link"><i className="bi bi-chevron-right"></i>Services</Link></li>
-              <li><Link to="/dashboard" className="footer-link"><i className="bi bi-chevron-right"></i>Dashboard</Link></li>
+              <li><Link to="/" className="footer-link"><i className="bi bi-chevron-right"></i>Home</Link></li>
             </ul>
           </div>
 
