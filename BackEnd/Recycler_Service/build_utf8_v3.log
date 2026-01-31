@@ -1,0 +1,40 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< com.example:Recycler_Service >--------------------
+[INFO] Building Recycler_Service 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ Recycler_Service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ Recycler_Service ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 16 source files with javac [debug release 21] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /D:/Ewaste-update/BackEnd/Recycler_Service/src/main/java/com/example/Recycler_Service/Service/RecyclingServiceImpl.java:[117,9] cannot find symbol
+  symbol:   class Optional
+  location: class com.example.Recycler_Service.Service.RecyclingServiceImpl
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  6.019 s
+[INFO] Finished at: 2026-01-31T22:35:27+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project Recycler_Service: Compilation failure
+[ERROR] /D:/Ewaste-update/BackEnd/Recycler_Service/src/main/java/com/example/Recycler_Service/Service/RecyclingServiceImpl.java:[117,9] cannot find symbol
+[ERROR]   symbol:   class Optional
+[ERROR]   location: class com.example.Recycler_Service.Service.RecyclingServiceImpl
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
