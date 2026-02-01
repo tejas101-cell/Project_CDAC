@@ -407,6 +407,55 @@ const ManageRequests = () => {
                                         <span>Status: {getStatusBadge(selectedRequest.status)}</span>
                                     </div>
                                 </div>
+
+                                <div className="bg-light p-4 rounded-3 mt-4">
+                                    <h6 className="fw-bold text-dark mb-3">Track Status</h6>
+                                    <div className="position-relative m-4">
+                                        <div className="progress" style={{ height: '2px' }}>
+                                            <div className="progress-bar bg-teal" role="progressbar"
+                                                style={{
+                                                    width: ['COMPLETED', 'COLLECTED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '100%' :
+                                                        (selectedRequest.status || '').toUpperCase() === 'COLLECTED' ? '80%' :
+                                                            (selectedRequest.status || '').toUpperCase() === 'PICKED_UP' ? '60%' :
+                                                                (selectedRequest.status || '').toUpperCase() === 'SCHEDULED' ? '40%' :
+                                                                    (selectedRequest.status || '').toUpperCase() === 'ACCEPTED' ? '20%' : '0%',
+                                                    backgroundColor: '#0f766e'
+                                                }}></div>
+                                        </div>
+
+                                        {/* Step 1: Submitted (0%) */}
+                                        <div className="position-absolute top-0 start-0 translate-middle btn btn-sm rounded-pill btn-primary"
+                                            style={{ backgroundColor: '#0f766e', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</div>
+
+                                        {/* Step 2: Accepted (20%) */}
+                                        <div className={`position-absolute top-0 translate-middle btn btn-sm rounded-pill ${['ACCEPTED', 'SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`}
+                                            style={{ left: '20%', backgroundColor: ['ACCEPTED', 'SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</div>
+
+                                        {/* Step 3: Scheduled (40%) */}
+                                        <div className={`position-absolute top-0 translate-middle btn btn-sm rounded-pill ${['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`}
+                                            style={{ left: '40%', backgroundColor: ['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>3</div>
+
+                                        {/* Step 4: Picked Up (60%) */}
+                                        <div className={`position-absolute top-0 translate-middle btn btn-sm rounded-pill ${['PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`}
+                                            style={{ left: '60%', backgroundColor: ['PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>4</div>
+
+                                        {/* Step 5: Collected (80%) */}
+                                        <div className={`position-absolute top-0 translate-middle btn btn-sm rounded-pill ${['COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`}
+                                            style={{ left: '80%', backgroundColor: ['COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>5</div>
+
+                                        {/* Step 6: Completed (100%) */}
+                                        <div className={`position-absolute top-0 start-100 translate-middle btn btn-sm rounded-pill ${['COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`}
+                                            style={{ backgroundColor: ['COMPLETED', 'DECOMPOSED'].includes((selectedRequest.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none', width: '24px', height: '24px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>6</div>
+                                    </div>
+                                    <div className="d-flex justify-content-between text-muted small px-2">
+                                        <span style={{ fontSize: '10px' }}>Submitted</span>
+                                        <span style={{ fontSize: '10px' }}>Accepted</span>
+                                        <span style={{ fontSize: '10px' }}>Scheduled</span>
+                                        <span style={{ fontSize: '10px' }}>Picked</span>
+                                        <span style={{ fontSize: '10px' }}>Collected</span>
+                                        <span style={{ fontSize: '10px' }}>Done</span>
+                                    </div>
+                                </div>
                             </div>
                             <div className="modal-footer border-0">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowViewModal(false)}>Close</button>

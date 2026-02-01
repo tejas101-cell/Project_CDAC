@@ -20,7 +20,6 @@ const RequestDetails = () => {
         if (window.confirm("Are you sure you want to delete this request? This action cannot be undone.")) {
             try {
                 await requestService.deleteRequest(id);
-                // alert("Request deleted successfully");
                 navigate('/my-requests');
             } catch (error) {
                 console.error("Failed to delete request", error);
@@ -103,7 +102,7 @@ const RequestDetails = () => {
                         <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
                             <div className="card-header bg-white border-0 py-4 px-4 px-md-5 d-flex justify-content-between align-items-center flex-wrap gap-3">
                                 <div>
-                                    <h5 className="text-muted text-uppercase small fw-bold mb-1">Request #{request.requestId}</h5>
+                                    <h5 className="text-muted text-uppercase small fw-bold mb-1">Request #{request.userRequestNo || request.requestId}</h5>
                                     <h2 className="fw-bold mb-0 text-dark">{mainItem.itemName || 'E-Waste Item'}</h2>
                                 </div>
                                 <div className="d-flex align-items-center gap-3">
@@ -170,21 +169,21 @@ const RequestDetails = () => {
                                         <div className="progress" style={{ height: '2px' }}>
                                             <div className="progress-bar bg-teal" role="progressbar"
                                                 style={{
-                                                    width: ['COMPLETED', 'COLLECTED'].includes(request.status) ? '100%' :
-                                                        request.status === 'PICKED_UP' ? '70%' :
-                                                            request.status === 'SCHEDULED' ? '50%' :
-                                                                request.status === 'ACCEPTED' ? '35%' : '15%',
+                                                    width: ['COMPLETED', 'COLLECTED', 'DECOMPOSED'].includes((request.status || '').toUpperCase()) ? '100%' :
+                                                        (request.status || '').toUpperCase() === 'PICKED_UP' ? '70%' :
+                                                            (request.status || '').toUpperCase() === 'SCHEDULED' ? '50%' :
+                                                                (request.status || '').toUpperCase() === 'ACCEPTED' ? '35%' : '15%',
                                                     backgroundColor: '#0f766e'
                                                 }}></div>
                                         </div>
-                                        {/* Step 1: PbSubmited */}
+                                        {/* Step 1: Submitted */}
                                         <div className="position-absolute top-0 start-0 translate-middle btn btn-sm rounded-pill btn-primary" style={{ backgroundColor: '#0f766e', border: 'none' }}>1</div>
 
                                         {/* Step 2: Scheduled/PickedUp */}
-                                        <div className={`position-absolute top-0 start-50 translate-middle btn btn-sm rounded-pill ${['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED'].includes(request.status) ? 'btn-primary' : 'btn-secondary'}`} style={{ backgroundColor: ['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED'].includes(request.status) ? '#0f766e' : '#e2e8f0', border: 'none' }}>2</div>
+                                        <div className={`position-absolute top-0 start-50 translate-middle btn btn-sm rounded-pill ${['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((request.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`} style={{ backgroundColor: ['SCHEDULED', 'PICKED_UP', 'COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((request.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none' }}>2</div>
 
                                         {/* Step 3: Collected/Completed */}
-                                        <div className={`position-absolute top-0 start-100 translate-middle btn btn-sm rounded-pill ${['COLLECTED', 'COMPLETED'].includes(request.status) ? 'btn-primary' : 'btn-secondary'}`} style={{ backgroundColor: ['COLLECTED', 'COMPLETED'].includes(request.status) ? '#0f766e' : '#e2e8f0', border: 'none' }}>3</div>
+                                        <div className={`position-absolute top-0 start-100 translate-middle btn btn-sm rounded-pill ${['COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((request.status || '').toUpperCase()) ? 'btn-primary' : 'btn-secondary'}`} style={{ backgroundColor: ['COLLECTED', 'COMPLETED', 'DECOMPOSED'].includes((request.status || '').toUpperCase()) ? '#0f766e' : '#e2e8f0', border: 'none' }}>3</div>
                                     </div>
                                     <div className="d-flex justify-content-between text-muted small px-2">
                                         <span>Submitted</span>
