@@ -14,6 +14,7 @@ import java.util.List;
 public class PickupRequestResponseDTO {
     private Integer requestID;
     private String userID;
+    private Integer userRequestNo;
     private LocalDateTime requestDate;
     private LocalDate pickupDate;
     private String pickupAddress;

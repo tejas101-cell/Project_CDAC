@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreatePickupResponseDTO {
     private Integer requestId;
+    private Integer userRequestNo;
     private String status;
     private String message;
 }

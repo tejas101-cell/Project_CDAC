@@ -40,8 +40,12 @@ public class PickupRequestServiceImpl implements PickupRequestService {
             throw new RuntimeException("User account is " + status + ". Pickup requests are only allowed for Active users.");
         }
 
+        // Calculate the next request number for this user
+        Integer currentCount = pickupRequestRepository.countByUserId(requestDTO.getUserId());
+        Integer nextNo = (currentCount == null) ? 1 : currentCount + 1;
         PickupRequests pickupRequests = PickupRequests.builder()
                 .userId(requestDTO.getUserId())
+                .userRequestNo(nextNo)
                 .requestDate(LocalDateTime.now())
                 .pickupDate(requestDTO.getPickupDate())
                 .pickupAddress(requestDTO.getPickupAddress())
@@ -69,6 +73,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
 
         return new CreatePickupResponseDTO(
                 savedRequest.getRequestId(),
+                savedRequest.getUserRequestNo(),
                 "Requested",
                 "Success"
         );
@@ -102,6 +107,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
         return new PickupRequestResponseDTO(
                 pickup.getRequestId(),
                 pickup.getUserId(),
+                pickup.getUserRequestNo(),
                 pickup.getRequestDate(),
                 pickup.getPickupDate(),
                 pickup.getPickupAddress(),
@@ -139,6 +145,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
             return new PickupRequestResponseDTO(
                     pickup.getRequestId(),
                     pickup.getUserId(),
+                    pickup.getUserRequestNo(),
                     pickup.getRequestDate(),
                     pickup.getPickupDate(),
                     pickup.getPickupAddress(),
@@ -165,6 +172,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
             return new PickupRequestResponseDTO(
                     pickup.getRequestId(),
                     pickup.getUserId(),
+                    pickup.getUserRequestNo(),
                     pickup.getRequestDate(),
                     pickup.getPickupDate(),
                     pickup.getPickupAddress(),
@@ -230,6 +238,7 @@ public class PickupRequestServiceImpl implements PickupRequestService {
         return new PickupRequestResponseDTO(
                 pickup.getRequestId(),
                 pickup.getUserId(),
+                pickup.getUserRequestNo(),
                 pickup.getRequestDate(),
                 pickup.getPickupDate(),
                 pickup.getPickupAddress(),

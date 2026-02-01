@@ -47,7 +47,7 @@ public class RecyclingServiceImpl implements RecyclingService {
         try {
             trackingClient.logStatus(new StatusLogDTO(requestId, "Delivered", collectorId));
             
-            // ⭐ CRITICAL SYNC: Update Pickup Service status to COMPLETED (or DELIVERED)
+            // CRITICAL SYNC: Update Pickup Service status to COMPLETED (or DELIVERED)
             // This ensures the User Dashboard reflects the successful handover.
             pickupClient.updateStatus(requestId, "COMPLETED", "ADMIN");
         } catch (Exception e) {

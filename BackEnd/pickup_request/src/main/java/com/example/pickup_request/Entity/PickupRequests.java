@@ -37,5 +37,9 @@ public class PickupRequests {
     private String status;
 
     @Column(name = "collector_id")
-private String collectorId;
+    private String collectorId;
+
+    @Column(name = "user_request_no")
+    private Integer userRequestNo;
+
 }
