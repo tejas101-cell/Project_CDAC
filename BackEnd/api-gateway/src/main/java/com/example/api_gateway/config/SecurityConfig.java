@@ -29,7 +29,8 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
-        String issuerUri = "http://localhost:8085/realms/ewaste-realm";
+        // Use Docker service name 'keycloak' instead of 'localhost'
+        String issuerUri = "http://keycloak:8080/realms/ewaste-realm";
         return NimbusReactiveJwtDecoder.withIssuerLocation(issuerUri).build();
     }
 }

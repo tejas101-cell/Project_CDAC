@@ -31,58 +31,76 @@ public class UserServiceImpl implements UserService {
 
 @Override
 public UserResponse register(RegisterRequest request) {
-    // 1. Check if user already exists in Local MySQL
-    java.util.Optional<User> existing = userRepository.findByEmail(request.getEmail());
-    if (existing.isPresent()) {
-        System.out.println("UserServiceImpl: User already exists in MySQL, returning existing.");
-        return mapToResponse(existing.get());
-    }
-
-    String keycloakUserId = request.getUserId();
-
-    // 2. IF NO USER ID PROVIDED (Manual registration from Website Form)
-    if (keycloakUserId == null || keycloakUserId.isEmpty()) {
-        System.out.println("UserServiceImpl: No UserID provided. Creating new account in Keycloak for: " + request.getEmail());
-        
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl("http://localhost:8085")
-                .realm("ewaste-realm")
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId("admin-cli-sync")
-                .clientSecret("Vro4R9Ly7toTABBaQdfKQ7MsLuL9uUa1")
-                .build();
-
-        UserRepresentation userRep = new UserRepresentation();
-        userRep.setEnabled(true);
-        userRep.setUsername(request.getEmail());
-        userRep.setEmail(request.getEmail());
-        userRep.setFirstName(request.getName());
-
-        CredentialRepresentation passwordCred = new CredentialRepresentation();
-        passwordCred.setTemporary(false);
-        passwordCred.setType(CredentialRepresentation.PASSWORD);
-        passwordCred.setValue(request.getPassword());
-        userRep.setCredentials(Collections.singletonList(passwordCred));
-
-        Response response = keycloak.realm("ewaste-realm").users().create(userRep);
-
-        if (response.getStatus() == 201) {
-            keycloakUserId = CreatedResponseUtil.getCreatedId(response);
-            // Assign Role in Keycloak
-            RoleRepresentation realmRole = keycloak.realm("ewaste-realm").roles().get(request.getRoleName().toUpperCase()).toRepresentation();
-            keycloak.realm("ewaste-realm").users().get(keycloakUserId).roles().realmLevel().add(Collections.singletonList(realmRole));
-            System.out.println("UserServiceImpl: Keycloak user created and role assigned: " + keycloakUserId);
-        } else if (response.getStatus() == 409) {
-            // User already exists in Keycloak! Find their ID instead of crashing
-            keycloakUserId = keycloak.realm("ewaste-realm").users().search(request.getEmail()).get(0).getId();
-            System.out.println("UserServiceImpl: User existed in Keycloak, found ID: " + keycloakUserId);
-        } else {
-            throw new RuntimeException("Keycloak creation failed! Status: " + response.getStatus());
+    System.out.println("=== REGISTRATION STARTED for: " + request.getEmail() + " ===");
+    
+    try {
+        // 1. Check if user already exists in Local MySQL
+        java.util.Optional<User> existing = userRepository.findByEmail(request.getEmail());
+        if (existing.isPresent()) {
+            System.out.println("UserServiceImpl: User already exists in MySQL, returning existing.");
+            return mapToResponse(existing.get());
         }
-    }
 
-    // 3. SAVE TO LOCAL DATABASE
-    System.out.println("UserServiceImpl: Syncing Keycloak User to MySQL: " + request.getEmail());
+        String keycloakUserId = request.getUserId();
+
+        // 2. IF NO USER ID PROVIDED (Manual registration from Website Form)
+        if (keycloakUserId == null || keycloakUserId.isEmpty()) {
+            System.out.println("UserServiceImpl: No UserID provided. Creating new account in Keycloak for: " + request.getEmail());
+            
+            String serverUrl = System.getenv("KEYCLOAK_AUTH_SERVER_URL");
+            System.out.println("UserServiceImpl: KEYCLOAK_AUTH_SERVER_URL = " + serverUrl);
+            if (serverUrl == null || serverUrl.isEmpty()) {
+                serverUrl = "http://localhost:8085";
+            }
+            System.out.println("UserServiceImpl: Using Keycloak URL: " + serverUrl);
+
+            Keycloak keycloak = KeycloakBuilder.builder()
+                    .serverUrl(serverUrl)
+                    .realm("ewaste-realm")
+                    .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                    .clientId("admin-cli-sync")
+                    .clientSecret("HEJ7qPMxf0pccsd7MBMA1QkHVic2v8JD")
+                    .build();
+
+            System.out.println("UserServiceImpl: Keycloak client built successfully");
+
+            UserRepresentation userRep = new UserRepresentation();
+            userRep.setEnabled(true);
+            userRep.setUsername(request.getEmail());
+            userRep.setEmail(request.getEmail());
+            userRep.setFirstName(request.getName());
+
+            CredentialRepresentation passwordCred = new CredentialRepresentation();
+            passwordCred.setTemporary(false);
+            passwordCred.setType(CredentialRepresentation.PASSWORD);
+            passwordCred.setValue(request.getPassword());
+            userRep.setCredentials(Collections.singletonList(passwordCred));
+
+            System.out.println("UserServiceImpl: Attempting to create user in Keycloak...");
+            Response response = keycloak.realm("ewaste-realm").users().create(userRep);
+            System.out.println("UserServiceImpl: Keycloak response status: " + response.getStatus());
+
+            if (response.getStatus() == 201) {
+                keycloakUserId = CreatedResponseUtil.getCreatedId(response);
+                System.out.println("UserServiceImpl: User created with ID: " + keycloakUserId);
+                // Assign Role in Keycloak
+                System.out.println("UserServiceImpl: Assigning role: " + request.getRoleName().toUpperCase());
+                RoleRepresentation realmRole = keycloak.realm("ewaste-realm").roles().get(request.getRoleName().toUpperCase()).toRepresentation();
+                keycloak.realm("ewaste-realm").users().get(keycloakUserId).roles().realmLevel().add(Collections.singletonList(realmRole));
+                System.out.println("UserServiceImpl: Keycloak user created and role assigned: " + keycloakUserId);
+            } else if (response.getStatus() == 409) {
+                // User already exists in Keycloak! Find their ID instead of crashing
+                keycloakUserId = keycloak.realm("ewaste-realm").users().search(request.getEmail()).get(0).getId();
+                System.out.println("UserServiceImpl: User existed in Keycloak, found ID: " + keycloakUserId);
+            } else {
+                String errorBody = response.readEntity(String.class);
+                System.out.println("UserServiceImpl: Keycloak error body: " + errorBody);
+                throw new RuntimeException("Keycloak creation failed! Status: " + response.getStatus() + ", Body: " + errorBody);
+            }
+        }
+
+        // 3. SAVE TO LOCAL DATABASE
+        System.out.println("UserServiceImpl: Syncing Keycloak User to MySQL: " + request.getEmail());
     String roleNameUpper = request.getRoleName().toUpperCase();
     Role localRole = roleRepository.findByRoleName(roleNameUpper);
     if (localRole == null) {
@@ -103,7 +121,15 @@ public UserResponse register(RegisterRequest request) {
     user.setPassword("KEYCLOAK_MANAGED");
 
     User savedUser = userRepository.save(user);
-    return mapToResponse(savedUser);
+        System.out.println("=== REGISTRATION SUCCESSFUL for: " + request.getEmail() + " ===");
+        return mapToResponse(savedUser);
+    } catch (Exception e) {
+        System.out.println("=== REGISTRATION FAILED for: " + request.getEmail() + " ===");
+        System.out.println("Exception type: " + e.getClass().getName());
+        System.out.println("Exception message: " + e.getMessage());
+        e.printStackTrace();
+        throw new RuntimeException("Registration failed: " + e.getMessage(), e);
+    }
 }
 
     @Override
