@@ -24,7 +24,7 @@ public class RestPickupRequestController {
 
     // why are we using the ResponseEntity
     @GetMapping("/pickups/{requestId}")
-    public ResponseEntity<PickupRequestResponseDTO> goPickupRequestByID(@PathVariable("requestId") Integer requestId){
+    public ResponseEntity<PickupRequestResponseDTO> gotPickupRequestByID(@PathVariable("requestId") Integer requestId){
         PickupRequestResponseDTO pickupRequest = pickupRequestService.getPickupRequestById(requestId);
         return ResponseEntity.ok(pickupRequest);
     }

@@ -15,5 +15,4 @@ public class UserResponse {
     private String roleName;
     private String availabilityStatus;
     private String status;
-    private LocalDateTime createdAt;
 }

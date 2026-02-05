@@ -43,11 +43,9 @@ public class UserServiceImpl implements UserService {
         user.setRole(role);
 
         // Password is managed by Identity Provider
-        user.setPassword("IDP_MANAGED");
 
         user.setAvailabilityStatus("Available");
         user.setStatus("Active");
-        user.setCreatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
         return mapToResponse(savedUser);
@@ -75,7 +73,6 @@ public class UserServiceImpl implements UserService {
 
         response.setAvailabilityStatus(user.getAvailabilityStatus());
         response.setStatus(user.getStatus());
-        response.setCreatedAt(user.getCreatedAt());
 
         return response;
     }

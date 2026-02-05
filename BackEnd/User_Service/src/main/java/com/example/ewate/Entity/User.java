@@ -21,9 +21,6 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     @Column(name = "phone")
     private String phone;
 
@@ -35,9 +32,6 @@ public class User {
 
     @Column(name = "status")
     private String status;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
